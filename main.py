@@ -133,6 +133,7 @@ async def index(
 @app.post("/register")
 async def set_register(email: str = Form(...), password: str = Form(...)):
     url = "/"
+    # TODO validate email
     user = users_db.get(email)
     if user is None:
         new_user = {
@@ -141,6 +142,13 @@ async def set_register(email: str = Form(...), password: str = Form(...)):
             "protocols": [],
         }
         users_db.put(new_user, email)
+        message = """<h1>Olá, bem vindo ao INPI Notifica</h1>"
+        """
+        try:
+            deta.send_email(email, "INPI Notifica", message)
+        except Exception as e:
+            print(e)
+            pass
     else:
         url += "?error=register"
     return RedirectResponse(url, status.HTTP_302_FOUND)
@@ -189,6 +197,8 @@ async def delete_protocol(protocol: str, user: dict = Depends(get_current_user))
     users_db.put(user, user["key"])
     return RedirectResponse("/", status.HTTP_302_FOUND)
 
+
+# TODO recover account
 
 # @app_cron.lib.cron()
 # def cron_job(event):
