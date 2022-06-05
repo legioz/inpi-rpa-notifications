@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container container-fluid mt-5">
+
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Protocolo</th>
+                <th scope="col">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row">1</th>
+                <td>123234512</td>
+                <td><span class="badge rounded-pill text-bg-danger">Aguardando</span></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<!-- Modals -->
+<div class="modal fade" id="register" tabindex="-1" aria-labelledby="LoginnLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="LoginnLabel">Cadastrar</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="register-form" action="/register" method="post" class="">
+                    <div class="mb-3">
+                        <label for="email1" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email1" aria-describedby="emailHelp" required>
+                        <div id="emailHelp" class="form-text"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email2" class="form-label">Confirmar Email</label>
+                        <input type="email" class="form-control" id="email2" aria-describedby="emailHelp" required onblur="validate_email()">
+                        <div id="emailHelp" class="form-text"></div>
+                        <div class="invalid-feedback" id="email-invalid-feedback">
+                            Confirmação inválida! 
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password1" class="form-label">Senha</label>
+                        <input type="password" class="form-control" id="password1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password2" class="form-label">Confirmar Senha</label>
+                        <input type="password" class="form-control" id="password2" required onblur="validate_password()">
+                        <div class="invalid-feedback" id="password-invalid-feedback">
+                            Confirmação inválida! 
+                        </div>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" required>
+                        <label class="form-check-label" for="terms">Eu concordo com as <a target="_blank"
+                                href="/terms">políticas e termos de uso.</a></label>
+                    </div>
+                    <button type="button" onclick="submit_register()" class="btn btn-primary">Cadastrar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="login" tabindex="-1" aria-labelledby="LoginnLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="LoginnLabel">Cadastrar</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="email1" class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email" aria-describedby="emailHelp" required>
+                        <div id="emailHelp" class="form-text"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password1" class="form-label">Senha</label>
+                        <input type="password" class="form-control" name="password" required>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" required>
+                        <label class="form-check-label" for="terms">Eu concordo com as <a target="_blank"
+                                href="/terms">políticas e termos de uso.</a></label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Acessar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function validate_email() {
+    let email1 = document.getElementById("email1");
+    let email2 = document.getElementById("email2");
+    if (email1.value == email2.value && email1.value != "") {
+        email2.classList.add("is-valid");
+        email2.classList.remove("is-invalid");
+        return true;
+    } else {
+        email2.classList.add("is-invalid");
+        email2.classList.remove("is-valid");
+        return false;
+    }
+}
+
+function validate_password() {
+    let password1 = document.getElementById("password1");
+    let password2 = document.getElementById("password2");
+    if (password1.value == password2.value && password1.value != "") {
+        password2.classList.add("is-valid");
+        password2.classList.remove("is-invalid");
+        return true;
+    } else {
+        password2.classList.add("is-invalid");
+        password2.classList.remove("is-valid");
+        return false;
+    }
+}
+
+function submit_register() {
+    let register_form = document.getElementById("register-form");
+    if (validate_email() && validate_password()) {
+        register_form.submit();
+    }
+}
+</script>
+
+{% endblock %}
