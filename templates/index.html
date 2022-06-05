@@ -19,6 +19,21 @@
             </tr>
         </tbody>
     </table>
+    <!-- <hr> -->
+    <form method="post" action="/protocol" class="mt-5">
+        <div class="col-md-4">
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="floatingInput" placeholder="protocolo" required>
+                <label for="floatingInput">Protocolo do INPI</label>
+                <div id="floatingInput" class="form-text">
+                    Informe o número de protocolo do INPI ao qual deseja ser notificado via email.
+                </div>
+              </div>
+        </div>
+        <div class="form-group mt-3">
+            <button type="submit" class="btn btn-primary">Cadastrar Protocolo</button>
+        </div>
+    </form>
 </div>
 <!-- Modals -->
 <div class="modal fade" id="register" tabindex="-1" aria-labelledby="LoginnLabel" aria-hidden="true">
@@ -37,10 +52,11 @@
                     </div>
                     <div class="mb-3">
                         <label for="email2" class="form-label">Confirmar Email</label>
-                        <input type="email" class="form-control" id="email2" aria-describedby="emailHelp" required onblur="validate_email()">
+                        <input type="email" class="form-control" id="email2" aria-describedby="emailHelp" required
+                            onblur="validate_email()">
                         <div id="emailHelp" class="form-text"></div>
                         <div class="invalid-feedback" id="email-invalid-feedback">
-                            Confirmação inválida! 
+                            Confirmação inválida!
                         </div>
                     </div>
                     <div class="mb-3">
@@ -49,9 +65,10 @@
                     </div>
                     <div class="mb-3">
                         <label for="password2" class="form-label">Confirmar Senha</label>
-                        <input type="password" class="form-control" id="password2" required onblur="validate_password()">
+                        <input type="password" class="form-control" id="password2" required
+                            onblur="validate_password()">
                         <div class="invalid-feedback" id="password-invalid-feedback">
-                            Confirmação inválida! 
+                            Confirmação inválida!
                         </div>
                     </div>
                     <div class="mb-3 form-check">
@@ -98,40 +115,40 @@
 </div>
 
 <script>
-function validate_email() {
-    let email1 = document.getElementById("email1");
-    let email2 = document.getElementById("email2");
-    if (email1.value == email2.value && email1.value != "") {
-        email2.classList.add("is-valid");
-        email2.classList.remove("is-invalid");
-        return true;
-    } else {
-        email2.classList.add("is-invalid");
-        email2.classList.remove("is-valid");
-        return false;
+    function validate_email() {
+        let email1 = document.getElementById("email1");
+        let email2 = document.getElementById("email2");
+        if (email1.value == email2.value && email1.value != "") {
+            email2.classList.add("is-valid");
+            email2.classList.remove("is-invalid");
+            return true;
+        } else {
+            email2.classList.add("is-invalid");
+            email2.classList.remove("is-valid");
+            return false;
+        }
     }
-}
 
-function validate_password() {
-    let password1 = document.getElementById("password1");
-    let password2 = document.getElementById("password2");
-    if (password1.value == password2.value && password1.value != "") {
-        password2.classList.add("is-valid");
-        password2.classList.remove("is-invalid");
-        return true;
-    } else {
-        password2.classList.add("is-invalid");
-        password2.classList.remove("is-valid");
-        return false;
+    function validate_password() {
+        let password1 = document.getElementById("password1");
+        let password2 = document.getElementById("password2");
+        if (password1.value == password2.value && password1.value != "") {
+            password2.classList.add("is-valid");
+            password2.classList.remove("is-invalid");
+            return true;
+        } else {
+            password2.classList.add("is-invalid");
+            password2.classList.remove("is-valid");
+            return false;
+        }
     }
-}
 
-function submit_register() {
-    let register_form = document.getElementById("register-form");
-    if (validate_email() && validate_password()) {
-        register_form.submit();
+    function submit_register() {
+        let register_form = document.getElementById("register-form");
+        if (validate_email() && validate_password()) {
+            register_form.submit();
+        }
     }
-}
 </script>
 
 {% endblock %}

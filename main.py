@@ -50,8 +50,8 @@ async def set_login(request: Request):
     return RedirectResponse("/", status.HTTP_302_FOUND)
 
 
-@app.post("/track-proccess")
-async def set_track_proccess(credentials: HTTPBasicCredentials = Depends(security)):
+@app.post("/protocol")
+async def set_protocol(credentials: HTTPBasicCredentials = Depends(security)):
     user = {"username": credentials.username, "password": credentials.password}
     return RedirectResponse("/", status.HTTP_302_FOUND)
 
