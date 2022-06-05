@@ -46,8 +46,8 @@
             <div class="modal-body">
                 <form id="register-form" action="/register" method="post" class="">
                     <div class="mb-3">
-                        <label for="email1" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email1" aria-describedby="emailHelp" required>
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" aria-describedby="emailHelp" required name="email">
                         <div id="emailHelp" class="form-text"></div>
                     </div>
                     <div class="mb-3">
@@ -60,8 +60,8 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="password1" class="form-label">Senha</label>
-                        <input type="password" class="form-control" id="password1" required>
+                        <label for="password" class="form-label">Senha</label>
+                        <input type="password" class="form-control" id="password" required name="password">
                     </div>
                     <div class="mb-3">
                         <label for="password2" class="form-label">Confirmar Senha</label>
@@ -72,7 +72,7 @@
                         </div>
                     </div>
                     <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" required>
+                        <input id="checkbox_terms" type="checkbox" class="form-check-input" required>
                         <label class="form-check-label" for="terms">Eu concordo com as <a target="_blank"
                                 href="/terms">políticas e termos de uso.</a></label>
                     </div>
@@ -92,20 +92,15 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form>
+                <form action="/login" method="post">
                     <div class="mb-3">
-                        <label for="email1" class="form-label">Email</label>
+                        <label for="email" class="form-label">Email</label>
                         <input type="email" class="form-control" name="email" aria-describedby="emailHelp" required>
                         <div id="emailHelp" class="form-text"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="password1" class="form-label">Senha</label>
+                        <label for="password" class="form-label">Senha</label>
                         <input type="password" class="form-control" name="password" required>
-                    </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" required>
-                        <label class="form-check-label" for="terms">Eu concordo com as <a target="_blank"
-                                href="/terms">políticas e termos de uso.</a></label>
                     </div>
                     <button type="submit" class="btn btn-primary">Acessar</button>
                 </form>
@@ -116,9 +111,9 @@
 
 <script>
     function validate_email() {
-        let email1 = document.getElementById("email1");
+        let email = document.getElementById("email");
         let email2 = document.getElementById("email2");
-        if (email1.value == email2.value && email1.value != "") {
+        if (email.value == email2.value && email.value != "") {
             email2.classList.add("is-valid");
             email2.classList.remove("is-invalid");
             return true;
@@ -130,9 +125,9 @@
     }
 
     function validate_password() {
-        let password1 = document.getElementById("password1");
+        let password = document.getElementById("password");
         let password2 = document.getElementById("password2");
-        if (password1.value == password2.value && password1.value != "") {
+        if (password.value == password2.value && password.value != "") {
             password2.classList.add("is-valid");
             password2.classList.remove("is-invalid");
             return true;
@@ -145,7 +140,8 @@
 
     function submit_register() {
         let register_form = document.getElementById("register-form");
-        if (validate_email() && validate_password()) {
+        let checkbox_terms = document.getElementById("checkbox_terms");
+        if (validate_email() && validate_password() && checkbox_terms.checked) {
             register_form.submit();
         }
     }
