@@ -30,7 +30,7 @@ app = FastAPI(version=__version__, docs_url=False, redoc_url=False)
 deta = Deta(PROJECT_KEY)
 templates = Jinja2Templates(directory="templates")
 users_db = deta.Base("users")
-protocols_db = deta.Base("protocols")
+protocols_drive = deta.Base("protocols")
 
 
 ALGORITHM = "HS512"
