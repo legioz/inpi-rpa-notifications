@@ -90,8 +90,8 @@ async def custom_http_exception_handler(request, exc):
     return RedirectResponse("/?error=login", status.HTTP_302_FOUND)
 
 @app.get("/", response_class=HTMLResponse)
-async def index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+async def index(request: Request, error: str = None):
+    return templates.TemplateResponse("index.html", {"request": request, "error": error})
 
 
 @app.post("/register")
