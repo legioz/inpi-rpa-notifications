@@ -26,7 +26,7 @@ __version__ = "0.0.1"
 load_dotenv(override=True)
 PROJECT_KEY = os.environ.get("PROJECT_KEY", "")
 
-app = FastAPI(version=__version__, docs_url=False, redoc_url=False, debug=True)
+app = FastAPI(version=__version__, docs_url=False, redoc_url=False)
 deta = Deta(PROJECT_KEY)
 templates = Jinja2Templates(directory="templates")
 users_db = deta.Base("users")
