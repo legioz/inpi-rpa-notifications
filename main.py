@@ -82,12 +82,18 @@ async def get_current_user(access_token: Union[str, None] = Cookie(default=None)
 
 
 @app.exception_handler(status.HTTP_404_NOT_FOUND)
-async def custom_http_exception_handler(request, exc):
+async def custom_http_exception_handler_404(request, exc):
     return RedirectResponse("/")
 
 @app.exception_handler(status.HTTP_401_UNAUTHORIZED)
-async def custom_http_exception_handler(request, exc):
+async def custom_http_exception_handler_401(request, exc):
     return RedirectResponse("/?error=login", status.HTTP_302_FOUND)
+
+
+@app.exception_handler(status.HTTP_422_UNPROCESSABLE_ENTITY)
+async def custom_http_exception_handler_422(request, exc):
+    return RedirectResponse("/?error=unprocessable", status.HTTP_302_FOUND)
+
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request, error: str = None):
@@ -125,8 +131,8 @@ async def set_login(email: str = Form(...), password: str = Form(...)):
 
 
 @app.post("/protocol")
-async def set_protocol(request: Request, user: str = Depends(get_current_user)):
-    print(user)
+async def set_protocol(protocol: str = Form(...), user: str = Depends(get_current_user)):
+    users_db.update({"data": {protocol: False}}, user["key"])
     return RedirectResponse("/", status.HTTP_302_FOUND)
 
 
