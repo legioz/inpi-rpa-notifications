@@ -9,14 +9,29 @@
                 <th scope="col">#</th>
                 <th scope="col">Protocolo</th>
                 <th scope="col">Status</th>
+                <th scope="col">Data de Cadastro</th>
+                <th scope="col">Ação</th>
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <th scope="row">1</th>
-                <td>123234512</td>
-                <td><span class="badge rounded-pill text-bg-danger">Aguardando</span></td>
-            </tr>
+            {% for protocol in user['protocols'] %}
+                    
+                    <tr>
+                        <th scope="row">{{ loop.index0 }}</th>
+                        <td>{{ protocol['id'] }}</td>
+                        <td>
+                        {% if protocol['status_ok'] %}
+                            <span class="badge rounded-pill text-bg-success">Deferido</span>
+                        {% else %}
+                            <span class="badge rounded-pill text-bg-warning">Aguardando</span>
+                        {% endif %}
+                        </td>
+                        <td>{{ protocol['created_at'] }}</td>
+                        <td>
+                            <a type="button" class="btn btn-danger btn-sm rounded-pill" href="/delete/protocol/{{protocol['id']}}">Deletar</a>
+                        </td>
+                    </tr>
+            {% endfor %}
         </tbody>
     </table>
     <!-- <hr> -->

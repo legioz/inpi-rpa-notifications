@@ -1,9 +1,19 @@
 import secrets, os
 from deta import Deta
+
 # from deta import app as app_cron
-from fastapi import FastAPI, HTTPException, status, Depends, Request, Response, Form, Cookie
+from fastapi import (
+    FastAPI,
+    HTTPException,
+    status,
+    Depends,
+    Request,
+    Response,
+    Form,
+    Cookie,
+)
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.security import  OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.templating import Jinja2Templates
 from dotenv import load_dotenv
 from passlib.context import CryptContext
@@ -20,12 +30,13 @@ app = FastAPI(version=__version__, docs_url=False, redoc_url=False, debug=True)
 deta = Deta(PROJECT_KEY)
 templates = Jinja2Templates(directory="templates")
 users_db = deta.Base("users")
+protocols_db = deta.Base("protocols")
 
 
-ALGORITHM = 'HS512'
+ALGORITHM = "HS512"
 ACCESS_TOKEN_EXPIRE_MINUTES = 15
-pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/login')
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 
 
 def verify_password(plain_password: str, hashed_password: str):
@@ -45,37 +56,52 @@ def authenticate_user(email: str, password: str):
     try:
         user = get_user(email)
     except Exception:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
-                detail='Database connection error')
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Database connection error",
+        )
     if not user:
         return False
-    if not verify_password(password, user.get('password')):
+    if not verify_password(password, user.get("password")):
         return False
     return user
 
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta]=None):
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
         expire = datetime.utcnow() + timedelta(minutes=15)
-    to_encode.update({'exp': expire, 'iat': datetime.utcnow()})
+    to_encode.update({"exp": expire, "iat": datetime.utcnow()})
     encoded_jwt = jwt.encode(to_encode, PROJECT_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 
-async def get_current_user(access_token: Union[str, None] = Cookie(default=None)):
-    credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
-            detail='Could not validate credentials', headers={'WWW-Authenticate': 'Bearer'})
+async def get_current_user_or_none(
+    access_token: Union[str, None] = Cookie(default=None)
+):
     try:
         if access_token is None:
-            raise credentials_exception
+            return None
         payload = jwt.decode(access_token, PROJECT_KEY, algorithms=[ALGORITHM])
-        email: str = payload.get('sub')
+        email: str = payload.get("sub")
     except Exception as e:
-        raise credentials_exception
+        return None
     user = get_user(email)
+    if user is None:
+        return None
+    return user
+
+
+async def get_current_user(access_token: Union[str, None] = Cookie(default=None)):
+    """Get logged user or raises HTTP 401"""
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    user = await get_current_user_or_none(access_token)
     if user is None:
         raise credentials_exception
     return user
@@ -84,6 +110,7 @@ async def get_current_user(access_token: Union[str, None] = Cookie(default=None)
 @app.exception_handler(status.HTTP_404_NOT_FOUND)
 async def custom_http_exception_handler_404(request, exc):
     return RedirectResponse("/")
+
 
 @app.exception_handler(status.HTTP_401_UNAUTHORIZED)
 async def custom_http_exception_handler_401(request, exc):
@@ -96,8 +123,11 @@ async def custom_http_exception_handler_422(request, exc):
 
 
 @app.get("/", response_class=HTMLResponse)
-async def index(request: Request, error: str = None):
-    return templates.TemplateResponse("index.html", {"request": request, "error": error})
+async def index(
+    request: Request, error: str = None, user: dict = Depends(get_current_user_or_none)
+):
+    context = {"request": request, "error": error, "user": user}
+    return templates.TemplateResponse("index.html", context)
 
 
 @app.post("/register")
@@ -107,7 +137,8 @@ async def set_register(email: str = Form(...), password: str = Form(...)):
     if user is None:
         new_user = {
             "password": get_password_hash(password),
-            "data": {},
+            "created_at": datetime.now().isoformat(timespec="seconds"),
+            "protocols": [],
         }
         users_db.put(new_user, email)
     else:
@@ -123,22 +154,39 @@ async def set_login(email: str = Form(...), password: str = Form(...)):
         return RedirectResponse("/?error=login", status.HTTP_302_FOUND)
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={'sub': user.get('email')}, 
-        expires_delta=access_token_expires
+        data={"sub": user["key"]}, expires_delta=access_token_expires
     )
     response.set_cookie("access_token", access_token)
-    return response 
+    return response
 
 
 @app.post("/protocol")
-async def set_protocol(protocol: str = Form(...), user: str = Depends(get_current_user)):
-    users_db.update({"data": {protocol: False}}, user["key"])
+async def set_protocol(
+    protocol: str = Form(...), user: dict = Depends(get_current_user)
+):
+    protocols = user.get("protocols", [])
+    if not protocol in [i["id"] for i in protocols]:
+        protocols.append(
+            {
+                "status_ok": False,
+                "created_at": datetime.now().isoformat(timespec="seconds"),
+                "updated_at": None,
+                "id": protocol,
+            }
+        )
+        user["protocols"] = protocols
+        users_db.put(user, user["key"])
+    else:
+        print("protocol already exists")
     return RedirectResponse("/", status.HTTP_302_FOUND)
 
 
-@app.post("/unsubscribe/{email}")
-async def unsubscribe(request: Request, email: str = None):
-    # TODO remove email 
+@app.get("/delete/protocol/{protocol}")
+async def delete_protocol(protocol: str, user: dict = Depends(get_current_user)):
+    protocols = user.get("protocols", [])
+    protocols = [i for i in protocols if i["id"] != protocol]
+    user["protocols"] = protocols
+    users_db.put(user, user["key"])
     return RedirectResponse("/", status.HTTP_302_FOUND)
 
 
