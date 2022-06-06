@@ -1,0 +1,18 @@
+
+  
+# Conda channels. We recommend using packages from the conda-forge channel.
+channels:
+  - conda-forge
+dependencies:
+  # Defining conda packages:
+  - python=3.9.5
+  # Adding pip itself as a conda package:
+  - pip=22.1.2
+  - geckodriver
+  - firefox
+  - pip:
+      # Defining pip packages:
+      - rpaframework==15.0.0
+      - python-dotenv==0.20.0
+ignoreFiles:
+  - .gitignore
