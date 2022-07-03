@@ -198,14 +198,3 @@ async def delete_protocol(protocol: str, user: dict = Depends(get_current_user))
     return RedirectResponse("/", status.HTTP_302_FOUND)
 
 
-# TODO recover account
-
-# @app_cron.lib.cron()
-# def cron_job(event):
-
-#     file = drive.get(name)
-#     # TODO cron para verificar arquivos com determinado ID e enviar email notificando
-
-#     deta.send_email(to, subject, message)
-
-#     return "verifica arquivo recente e busca"

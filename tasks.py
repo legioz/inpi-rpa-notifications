@@ -67,6 +67,10 @@ def search_protocols(file: str):
                             protocol["updated_at"] = datetime.now().isoformat(timespec="seconds")
                             protocol["status_ok"] = True
                     users_db.update({"protocols": user_protocols}, user["key"])
+                    try:
+                        deta.send_email(user["key"], "INPI UPDATE", "Protocolos atualizados")
+                    except Exception as e:
+                        print(f"{e}")
 
 
 def main():
