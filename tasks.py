@@ -1,4 +1,4 @@
-import time, os, zipfile
+import time, os, zipfile, datetime
 from deta import Deta
 from pathlib import Path
 from RPA.Browser.Selenium import Selenium
@@ -57,26 +57,23 @@ def download_file() -> str:
 def search_protocols(file: str):
     """search protocols in file and update protocol status in Base if found"""
     filename, ext = file.split(".")
-    protocol_list = []
-    # print(users_db.fetch())
-    for user in users_db.fetch():
-        print(user)
-    #     protocols = user.get("protocols", [])
-    #     protocol_list.append(protocol["id"] for protocol in protocols)
-    # with zipfile.ZipFile(Path(DOWNLOAD_DIR).joinpath(file), "r") as zip:
-    #     with zip.open(f"{filename}.xml") as file:
-    #         for line in file:
-    #             for protocol in protocol_list:
-    #                 if protocol in line:
-    #                     users_db.
-    return
+    with zipfile.ZipFile(Path(DOWNLOAD_DIR).joinpath(file), "r") as zip:
+        with zip.open(f"{filename}.xml") as file:
+            for line in file:
+                for user in users_db.fetch().items:
+                    user_protocols = user.get("protocols", []) 
+                    for protocol in user_protocols:
+                        if protocol["id"] in str(line):
+                            protocol["updated_at"] = datetime.now().isoformat(timespec="seconds")
+                            protocol["status_ok"] = True
+                    users_db.update({"protocols": user_protocols}, user["key"])
 
 
 def main():
     try:
-        # open_website("http://revistas.inpi.gov.br/rpi/")
-        # file = download_file()
-        search_protocols("file.t")
+        open_website("http://revistas.inpi.gov.br/rpi/")
+        file = download_file()
+        search_protocols(file)
     finally:
         browser_lib.close_all_browsers()
     print(f"--- {time.time() - start_time} seconds ---")
